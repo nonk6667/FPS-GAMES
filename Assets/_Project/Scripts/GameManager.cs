@@ -6,16 +6,16 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    [Header("Timer")]
+    [Header("Match Settings")]
     [SerializeField] private float matchDuration = 60f;
+
+    [Header("UI References")]
     [SerializeField] private TMP_Text timerText;
+    [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private TMP_Text finalScoreText;
 
-    [Header("Game Over UI")]
-    [SerializeField] private GameObject gameOverPanel;   // 一个Panel
-    [SerializeField] private TMP_Text finalScoreText;    // Panel里的文字
-
-    [Header("Optional: disable control on end")]
-    [SerializeField] private MonoBehaviour[] scriptsToDisable; // FPSController / GunShoot等
+    [Header("Disable Gameplay Objects On End")]
+    [SerializeField] private GameObject[] gameplayRootsToDisable;
 
     private float timeLeft;
     public bool IsGameOver { get; private set; }
@@ -27,8 +27,8 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
-        // DontDestroyOnLoad(gameObject); // 不建议这里用，先别跨场景
     }
 
     private void Start()
@@ -41,7 +41,12 @@ public class GameManager : MonoBehaviour
         IsGameOver = false;
         timeLeft = matchDuration;
 
-        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         UpdateTimerUI();
     }
 
@@ -50,50 +55,64 @@ public class GameManager : MonoBehaviour
         if (IsGameOver) return;
 
         timeLeft -= Time.deltaTime;
+
         if (timeLeft <= 0f)
         {
             timeLeft = 0f;
             EndMatch();
+            return;
         }
 
         UpdateTimerUI();
-
-        // 方便测试：按 R 重开
-        if (Input.GetKeyDown(KeyCode.R))
-            Restart();
     }
 
     private void UpdateTimerUI()
     {
         if (timerText == null) return;
 
-        int sec = Mathf.CeilToInt(timeLeft);
-        timerText.text = $"Time: {sec}";
+        int seconds = Mathf.CeilToInt(timeLeft);
+        timerText.text = $"Time: {seconds}";
     }
 
     private void EndMatch()
     {
         IsGameOver = true;
 
-        // 禁用控制（可选但建议）
-        if (scriptsToDisable != null)
+        if (gameplayRootsToDisable != null)
         {
-            foreach (var s in scriptsToDisable)
-                if (s != null) s.enabled = false;
+            foreach (var go in gameplayRootsToDisable)
+            {
+                if (go != null)
+                    go.SetActive(false);
+            }
         }
 
-        // 弹 GameOver 面板 + 最终分数
-        int score = (ScoreManager.Instance != null) ? ScoreManager.Instance.GetScore() : 0;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        int score = 0;
+        if (ScoreManager.Instance != null)
+            score = ScoreManager.Instance.GetScore();
 
         if (finalScoreText != null)
-            finalScoreText.text = $"Time Up!\nFinal Score: {score}\nPress R to Restart";
+            finalScoreText.text = $"Time Up!\nFinal Score: {score}";
 
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
     }
 
-    public void Restart()
+    public void RestartGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.name);
+    }
+
+    public void QuitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }
