@@ -72,23 +72,23 @@ public class GunShoot : MonoBehaviour
     [SerializeField] private string muzzlePointName = "MuzzlePoint";
 
     [Header("Hit FX")]
-    [SerializeField] private GameObject hitSparkPrefab; // wall
-    [SerializeField] private GameObject hitBloodPrefab; // enemy
+    [SerializeField] private GameObject hitSparkPrefab;
+    [SerializeField] private GameObject hitBloodPrefab;
     [SerializeField] private float hitFxLifetime = 2f;
     [SerializeField] private string enemyLayerName = "Enemy";
 
     [Header("Damage")]
     [SerializeField] private float pistolDamage = 25f;
     [SerializeField] private float akDamage = 12f;
-    [SerializeField] private bool damageEnemyOnly = true;  // true = 只打 Enemy 扣血
-    [SerializeField] private bool debugDamageLog = true;   // 输出扣血信息
+    [SerializeField] private bool damageEnemyOnly = true;
+    [SerializeField] private bool debugDamageLog = true;
 
     [Header("Debug")]
     [SerializeField] private bool logMuzzleEachShot = false;
     [SerializeField] private bool debugDrawRays = false;
     [SerializeField] private float debugRayTime = 0.5f;
-    [SerializeField] private bool debugHitLog = true;     // HIT/MISS & object
-    [SerializeField] private bool debugFxLog = true;      // FX spawn logs
+    [SerializeField] private bool debugHitLog = true;
+    [SerializeField] private bool debugFxLog = true;
 
     private WeaponProfile W => useAK74 ? ak74 : pistol;
     private float CurrentDamage => useAK74 ? akDamage : pistolDamage;
@@ -210,10 +210,6 @@ public class GunShoot : MonoBehaviour
         ShootOnce();
     }
 
-    /// <summary>
-    /// Hit detection uses CAMERA ray (matches crosshair),
-    /// tracer uses MUZZLE -> hitPoint for visuals.
-    /// </summary>
     private void ShootOnce()
     {
         if (playerCamera == null) return;
@@ -229,7 +225,10 @@ public class GunShoot : MonoBehaviour
         _shotSpreadExtra += W.shotSpreadIncrease;
         _recoilTarget += W.kickDegrees;
 
-        // ---- CAMERA RAY (crosshair) ----
+        // Register one shot for accuracy tracking
+        if (AccuracyManager.Instance != null)
+            AccuracyManager.Instance.RegisterShot();
+
         Vector3 camOrigin = playerCamera.transform.position;
         Vector3 camDir = playerCamera.transform.forward;
 
@@ -263,14 +262,10 @@ public class GunShoot : MonoBehaviour
         {
             hitPoint = hit.point;
 
-            // ✅ 先处理伤害
             TryApplyDamage(hit);
-
-            // ✅ 再生成特效（敌人喷血 / 墙面火花）
             SpawnHitFX(hit);
         }
 
-        // ---- TRACER VISUAL: MUZZLE -> HIT POINT ----
         if (tracer != null)
         {
             tracer.useWorldSpace = true;
@@ -296,12 +291,15 @@ public class GunShoot : MonoBehaviour
 
         if (damageEnemyOnly && !isEnemy) return;
 
-        // 支持：Collider 在子物体上，Health 在父物体
         Health hp = hit.collider.GetComponentInParent<Health>();
         if (hp == null) return;
 
         float dmg = CurrentDamage;
         hp.TakeDamage(dmg);
+
+        // Register a successful hit on an enemy for accuracy tracking
+        if (AccuracyManager.Instance != null)
+            AccuracyManager.Instance.RegisterHit();
 
         if (debugDamageLog)
             Debug.Log($"[GunShoot] Damage {dmg} -> {hp.name}");
@@ -320,8 +318,6 @@ public class GunShoot : MonoBehaviour
         }
 
         Quaternion rot = Quaternion.LookRotation(-hit.normal);
-
-        // 往外偏移一点，避免生成在墙体内部导致看不到
         Vector3 spawnPos = hit.point + hit.normal * 0.05f;
 
         GameObject fx = Instantiate(prefab, spawnPos, rot);
