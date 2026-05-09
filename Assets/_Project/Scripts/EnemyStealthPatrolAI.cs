@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class EnemyStealthPatrolAI : MonoBehaviour
 {
@@ -28,8 +29,14 @@ public class EnemyStealthPatrolAI : MonoBehaviour
     [SerializeField] private Transform player;
     [SerializeField] private float alertRange = 4f;
     [SerializeField] private float alertTimeRequired = 5f;
-    [SerializeField] private bool ignoreCrouchingForProximity = true;
+    [SerializeField] private bool ignoreCrouchingForProximity = false;
     [SerializeField] private string failSceneName = "start";
+
+    [Header("Alert UI")]
+    [SerializeField] private GameObject alertCanvas;
+    [SerializeField] private Image alertFillImage;
+    [SerializeField] private bool hideAlertWhenEmpty = true;
+    [SerializeField] private float alertDecreaseSpeed = 2f;
 
     [Header("Optional Vision Detection")]
     [SerializeField] private bool enableVisionDetection = false;
@@ -94,6 +101,10 @@ public class EnemyStealthPatrolAI : MonoBehaviour
         }
 
         IgnoreOtherEnemyCollisions();
+        UpdateAlertUI();
+
+        if (alertCanvas != null && hideAlertWhenEmpty)
+            alertCanvas.SetActive(false);
     }
 
     private void Update()
@@ -119,11 +130,7 @@ public class EnemyStealthPatrolAI : MonoBehaviour
         }
 
         Vector3 targetPosition = patrolPoints[currentPointIndex].position;
-
-        if (lockY)
-            targetPosition.y = fixedY;
-        else
-            targetPosition.y = transform.position.y;
+        targetPosition.y = lockY ? fixedY : transform.position.y;
 
         Vector3 toTarget = targetPosition - transform.position;
         toTarget.y = 0f;
@@ -174,21 +181,50 @@ public class EnemyStealthPatrolAI : MonoBehaviour
         {
             if (!ignoreCrouchingForProximity && IsPlayerCrouching())
             {
-                proximityTimer = 0f;
+                proximityTimer = Mathf.Max(0f, proximityTimer - Time.deltaTime * alertDecreaseSpeed);
+                UpdateAlertUI();
+                UpdateAlertCanvasVisibility();
                 return;
             }
 
             proximityTimer += Time.deltaTime;
 
+            if (alertCanvas != null)
+                alertCanvas.SetActive(true);
+
+            UpdateAlertUI();
+
             if (proximityTimer >= alertTimeRequired)
-            {
                 TriggerAlarm();
-            }
         }
         else
         {
-            proximityTimer = 0f;
+            proximityTimer = Mathf.Max(0f, proximityTimer - Time.deltaTime * alertDecreaseSpeed);
+            UpdateAlertUI();
+            UpdateAlertCanvasVisibility();
         }
+    }
+
+    private void UpdateAlertUI()
+    {
+        if (alertFillImage == null) return;
+
+        float progress = 0f;
+
+        if (alertTimeRequired > 0f)
+            progress = Mathf.Clamp01(proximityTimer / alertTimeRequired);
+
+        alertFillImage.fillAmount = progress;
+    }
+
+    private void UpdateAlertCanvasVisibility()
+    {
+        if (alertCanvas == null) return;
+
+        if (hideAlertWhenEmpty && proximityTimer <= 0.01f)
+            alertCanvas.SetActive(false);
+        else
+            alertCanvas.SetActive(true);
     }
 
     private void TriggerAlarm()
@@ -233,11 +269,9 @@ public class EnemyStealthPatrolAI : MonoBehaviour
         toPlayer.y = 0f;
 
         float distanceToPlayer = toPlayer.magnitude;
-
         if (distanceToPlayer > detectionRange) return;
 
         float angleToPlayer = Vector3.Angle(transform.forward, toPlayer.normalized);
-
         if (angleToPlayer > detectionAngle * 0.5f) return;
 
         if (IsPlayerCrouching()) return;
@@ -251,9 +285,7 @@ public class EnemyStealthPatrolAI : MonoBehaviour
         if (Physics.Raycast(eyePosition, rayDirection.normalized, out RaycastHit hit, detectionRange, rayMask))
         {
             if (hit.transform == player || hit.transform.IsChildOf(player))
-            {
                 TriggerAlarm();
-            }
         }
     }
 
