@@ -50,6 +50,14 @@ public class GunShoot : MonoBehaviour
     [Header("Weapon Selection")]
     [SerializeField] private bool useAK74 = true;
 
+    [Header("Ammo")]
+    [SerializeField] private AmmoSystem ammoSystem;
+
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip akFireSound;
+    [SerializeField] private AudioClip pistolFireSound;
+
     [Header("Weapon Visuals")]
     [SerializeField] private GameObject akVisual;
     [SerializeField] private GameObject pistolVisual;
@@ -132,6 +140,12 @@ public class GunShoot : MonoBehaviour
         if (playerCamera == null) playerCamera = Camera.main;
         _controller = GetComponent<CharacterController>();
 
+        if (ammoSystem == null)
+            ammoSystem = GetComponent<AmmoSystem>();
+
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
+
         _recoilPivot = recoilPivot;
         if (_recoilPivot == null && playerCamera != null)
             _recoilPivot = playerCamera.transform.parent;
@@ -206,6 +220,11 @@ public class GunShoot : MonoBehaviour
         if (!wantShoot) return;
         if (Time.time < _nextFireTime) return;
 
+        if (ammoSystem != null && !ammoSystem.CanShoot())
+        {
+            return;
+        }
+
         _nextFireTime = Time.time + W.fireInterval;
         ShootOnce();
     }
@@ -217,6 +236,13 @@ public class GunShoot : MonoBehaviour
         Transform m = CurrentMuzzle;
         if (m == null) return;
 
+        if (ammoSystem != null)
+        {
+            ammoSystem.UseBullet();
+        }
+
+        PlayFireSound();
+
         if (logMuzzleEachShot)
             Debug.Log($"[GunShoot] Weapon={W.weaponName}, Muzzle={m.name}, MuzzlePos={m.position}");
 
@@ -225,7 +251,6 @@ public class GunShoot : MonoBehaviour
         _shotSpreadExtra += W.shotSpreadIncrease;
         _recoilTarget += W.kickDegrees;
 
-        // Register one shot for accuracy tracking
         if (AccuracyManager.Instance != null)
             AccuracyManager.Instance.RegisterShot();
 
@@ -297,7 +322,6 @@ public class GunShoot : MonoBehaviour
         float dmg = CurrentDamage;
         hp.TakeDamage(dmg);
 
-        // Register a successful hit on an enemy for accuracy tracking
         if (AccuracyManager.Instance != null)
             AccuracyManager.Instance.RegisterHit();
 
@@ -324,6 +348,16 @@ public class GunShoot : MonoBehaviour
         Destroy(fx, hitFxLifetime);
 
         if (debugFxLog) Debug.Log("[GunShoot] Spawned FX at: " + spawnPos);
+    }
+
+    private void PlayFireSound()
+    {
+        if (audioSource == null) return;
+
+        AudioClip clip = useAK74 ? akFireSound : pistolFireSound;
+
+        if (clip != null)
+            audioSource.PlayOneShot(clip);
     }
 
     private IEnumerator DisableTracer()
