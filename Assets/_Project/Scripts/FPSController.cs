@@ -23,6 +23,15 @@ public class FPSController : MonoBehaviour
     public float coyoteTime = 0.12f;
     public float jumpBufferTime = 0.12f;
 
+    [Header("Footstep Audio")]
+    [SerializeField] private AudioSource footstepAudioSource;
+    [SerializeField] private AudioClip walkingSound;
+    [SerializeField] private float footstepMoveThreshold = 0.1f;
+    [SerializeField] private float footstepWalkVolume = 0.45f;
+    [SerializeField] private float footstepCrouchVolume = 0.25f;
+    [SerializeField] private float footstepWalkPitch = 1f;
+    [SerializeField] private float footstepCrouchPitch = 0.75f;
+
     private CharacterController controller;
     private Vector3 velocity;
 
@@ -41,6 +50,8 @@ public class FPSController : MonoBehaviour
 
         currentSpeed = walkSpeed;
 
+        SetupFootstepAudio();
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -54,19 +65,20 @@ public class FPSController : MonoBehaviour
         Move();
         JumpAndGravity();
         UpdateCameraHeight();
+        UpdateFootstepAudio();
     }
 
     void MouseLook()
     {
-    float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
-    float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
+        float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
 
-    xRotation -= mouseY;
-    xRotation = Mathf.Clamp(xRotation, -89f, 89f);
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -89f, 89f);
 
-    cameraPivot.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-    transform.Rotate(Vector3.up * mouseX);
-}
+        cameraPivot.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        transform.Rotate(Vector3.up * mouseX);
+    }
     void UpdateTimers()
     {
         if (controller.isGrounded) coyoteTimer = coyoteTime;
@@ -125,5 +137,51 @@ public class FPSController : MonoBehaviour
         Vector3 lp = cameraPivot.localPosition;
         lp.y = Mathf.Lerp(lp.y, targetY, Time.deltaTime * cameraLerpSpeed);
         cameraPivot.localPosition = lp;
+    }
+
+    void SetupFootstepAudio()
+    {
+        if (walkingSound == null) return;
+
+        if (footstepAudioSource == null)
+        {
+            GameObject footstepObject = new GameObject("FootstepAudio");
+            footstepObject.transform.SetParent(transform, false);
+            footstepAudioSource = footstepObject.AddComponent<AudioSource>();
+        }
+
+        footstepAudioSource.clip = walkingSound;
+        footstepAudioSource.loop = true;
+        footstepAudioSource.playOnAwake = false;
+        footstepAudioSource.spatialBlend = 0f;
+        footstepAudioSource.dopplerLevel = 0f;
+        footstepAudioSource.bypassReverbZones = true;
+        footstepAudioSource.volume = footstepWalkVolume;
+        footstepAudioSource.pitch = footstepWalkPitch;
+    }
+
+    void UpdateFootstepAudio()
+    {
+        if (footstepAudioSource == null || walkingSound == null || controller == null)
+            return;
+
+        bool hasMoveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).sqrMagnitude
+            > footstepMoveThreshold * footstepMoveThreshold;
+        bool shouldPlay = controller.isGrounded && hasMoveInput;
+
+        if (!shouldPlay)
+        {
+            if (footstepAudioSource.isPlaying)
+                footstepAudioSource.Stop();
+
+            return;
+        }
+
+        bool crouching = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C);
+        footstepAudioSource.volume = crouching ? footstepCrouchVolume : footstepWalkVolume;
+        footstepAudioSource.pitch = crouching ? footstepCrouchPitch : footstepWalkPitch;
+
+        if (!footstepAudioSource.isPlaying)
+            footstepAudioSource.Play();
     }
 }

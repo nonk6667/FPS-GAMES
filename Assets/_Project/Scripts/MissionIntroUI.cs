@@ -18,10 +18,10 @@ public class MissionIntroUI : MonoBehaviour
         if (missionText != null)
         {
             missionText.text =
-                "Mission 1: Infiltrate the Factory\n\n" +
-                "Avoid staying too close to enemy guards.\n" +
-                "Crouch to reduce suspicion.\n" +
-                "Eliminate all enemies to enter the factory.";
+                "Mission 1: Tutorial Training\n\n" +
+                "Read the signs ahead of your spawn point.\n" +
+                "Practice movement, jumping, crouching, and shooting.\n" +
+                "Eliminate the first marked Bot to complete Level 1.";
         }
 
         Invoke(nameof(HideMissionPanel), displayTime);

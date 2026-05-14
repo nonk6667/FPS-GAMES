@@ -57,6 +57,12 @@ public class GunShoot : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip akFireSound;
     [SerializeField] private AudioClip pistolFireSound;
+    [Range(0f, 3f)]
+    [SerializeField] private float akFireVolume = 1.8f;
+    [Range(0f, 3f)]
+    [SerializeField] private float pistolFireVolume = 1f;
+    [SerializeField] private AudioClip akSwitchSound;
+    [SerializeField] private AudioClip pistolSwitchSound;
 
     [Header("Weapon Visuals")]
     [SerializeField] private GameObject akVisual;
@@ -100,6 +106,7 @@ public class GunShoot : MonoBehaviour
 
     private WeaponProfile W => useAK74 ? ak74 : pistol;
     private float CurrentDamage => useAK74 ? akDamage : pistolDamage;
+    public bool IsUsingAK74 => useAK74;
 
     private Transform CurrentMuzzle
     {
@@ -146,6 +153,8 @@ public class GunShoot : MonoBehaviour
         if (audioSource == null)
             audioSource = GetComponent<AudioSource>();
 
+        ConfigureSfxAudioSource();
+
         _recoilPivot = recoilPivot;
         if (_recoilPivot == null && playerCamera != null)
             _recoilPivot = playerCamera.transform.parent;
@@ -173,7 +182,11 @@ public class GunShoot : MonoBehaviour
 
     private void SetWeapon(bool toAK)
     {
-        if (useAK74 == toAK) return;
+        if (useAK74 == toAK)
+        {
+            PlayWeaponSwitchSound(toAK);
+            return;
+        }
 
         useAK74 = toAK;
 
@@ -191,6 +204,7 @@ public class GunShoot : MonoBehaviour
             tracer.enabled = false;
 
         ApplyWeaponVisuals();
+        PlayWeaponSwitchSound(useAK74);
     }
 
     private void ApplyWeaponVisuals()
@@ -355,9 +369,31 @@ public class GunShoot : MonoBehaviour
         if (audioSource == null) return;
 
         AudioClip clip = useAK74 ? akFireSound : pistolFireSound;
+        float volume = useAK74 ? akFireVolume : pistolFireVolume;
+
+        if (clip != null)
+            audioSource.PlayOneShot(clip, volume);
+    }
+
+    private void PlayWeaponSwitchSound(bool forAK)
+    {
+        if (audioSource == null) return;
+
+        AudioClip clip = forAK ? akSwitchSound : pistolSwitchSound;
 
         if (clip != null)
             audioSource.PlayOneShot(clip);
+    }
+
+    private void ConfigureSfxAudioSource()
+    {
+        if (audioSource == null) return;
+
+        audioSource.playOnAwake = false;
+        audioSource.loop = false;
+        audioSource.spatialBlend = 0f;
+        audioSource.dopplerLevel = 0f;
+        audioSource.bypassReverbZones = true;
     }
 
     private IEnumerator DisableTracer()

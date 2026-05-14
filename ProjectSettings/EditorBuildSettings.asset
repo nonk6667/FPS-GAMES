@@ -16,10 +16,13 @@ EditorBuildSettings:
     guid: 5bfcf72e3c6284898bdeee6af6f3e54b
   - enabled: 1
     path: Assets/_Project/Scenes/Level2_Combat.unity
-    guid: fa03b445164aa4217b071a55429361d7
+    guid: 683de6cff939a4d45a2cdbbf1d11ca9d
   - enabled: 1
     path: Assets/_Project/Scenes/Level3_Rescue.unity
-    guid: 2814af1b8ffa84074966988fa433f1ec
+    guid: 602d420f8ca854e8197b27ec9d23918a
+  - enabled: 1
+    path: Assets/_Project/Scenes/EndScene.unity
+    guid: 2419ee7bf20a44279a086255c086222b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

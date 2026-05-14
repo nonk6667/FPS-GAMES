@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class EnemyStealthPatrolAI : MonoBehaviour
@@ -230,7 +229,7 @@ public class EnemyStealthPatrolAI : MonoBehaviour
     private void TriggerAlarm()
     {
         Debug.Log($"{name} triggered alarm. Player stayed too close for too long.");
-        SceneManager.LoadScene(failSceneName);
+        SceneLoadHelper.LoadScene(failSceneName, "Level 1 alarm");
     }
 
     private Vector3 GetSeparationDirection()

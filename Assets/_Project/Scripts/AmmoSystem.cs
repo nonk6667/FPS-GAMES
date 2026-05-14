@@ -15,8 +15,11 @@ public class AmmoSystem : MonoBehaviour
     [SerializeField] private float reloadTime = 1.8f;
 
     [Header("Audio")]
+    [SerializeField] private GunShoot gunShoot;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip reloadSound;
+    [SerializeField] private AudioClip akReloadSound;
+    [SerializeField] private AudioClip pistolReloadSound;
 
     [Header("UI")]
     [SerializeField] private TMP_Text ammoText;
@@ -31,6 +34,11 @@ public class AmmoSystem : MonoBehaviour
 
         if (audioSource == null)
             audioSource = GetComponent<AudioSource>();
+
+        ConfigureSfxAudioSource();
+
+        if (gunShoot == null)
+            gunShoot = GetComponent<GunShoot>();
 
         UpdateUI();
     }
@@ -72,9 +80,10 @@ public class AmmoSystem : MonoBehaviour
         isReloading = true;
 
         // 播放换弹音效
-        if (audioSource != null && reloadSound != null)
+        AudioClip selectedReloadSound = GetCurrentReloadSound();
+        if (audioSource != null && selectedReloadSound != null)
         {
-            audioSource.PlayOneShot(reloadSound);
+            audioSource.PlayOneShot(selectedReloadSound);
         }
 
         UpdateUI();
@@ -100,7 +109,32 @@ public class AmmoSystem : MonoBehaviour
         }
         else
         {
-            ammoText.text = currentAmmo + " / " + spareMagazines + " mags";
+            ammoText.text = currentAmmo + " / " + spareMagazines;
         }
+    }
+
+    private AudioClip GetCurrentReloadSound()
+    {
+        if (gunShoot == null)
+        {
+            return reloadSound;
+        }
+
+        if (gunShoot.IsUsingAK74)
+        {
+            return akReloadSound != null ? akReloadSound : reloadSound;
+        }
+
+        return pistolReloadSound != null ? pistolReloadSound : reloadSound;
+    }
+
+    private void ConfigureSfxAudioSource()
+    {
+        if (audioSource == null) return;
+
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 0f;
+        audioSource.dopplerLevel = 0f;
+        audioSource.bypassReverbZones = true;
     }
 }

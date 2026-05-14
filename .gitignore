@@ -73,3 +73,9 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Oversized local Unity assets. Keep these locally unless Git LFS is installed.
+/Assets/_Project/Materials/Ch15_nonPBR.fbx
+/Assets/_Project/Materials/Ch15_nonPBR.fbx.meta
+/Assets/_Project/Materials/Strafe Right.fbx
+/Assets/_Project/Materials/Strafe Right.fbx.meta

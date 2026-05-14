@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class LevelCompleteManager : MonoBehaviour
 {
@@ -48,12 +47,6 @@ public class LevelCompleteManager : MonoBehaviour
 
     private void LoadNextScene()
     {
-        if (string.IsNullOrEmpty(nextSceneName))
-        {
-            Debug.LogWarning("Next Scene Name is empty.");
-            return;
-        }
-
-        SceneManager.LoadScene(nextSceneName);
+        SceneLoadHelper.LoadScene(nextSceneName, "Level complete");
     }
 }
