@@ -149,6 +149,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenu
   firstLevelSceneName: Level1_Stealth
+  startButtonName: Startbutton
+  quitButtonName: Quitbutton
   startButtonHitArea: {fileID: 279891514}
   enableFallbackInput: 0
 --- !u!4 &50364188
@@ -663,6 +665,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenu
   firstLevelSceneName: Level1_Stealth
+  startButtonName: Startbutton
+  quitButtonName: Quitbutton
   startButtonHitArea: {fileID: 279891514}
   enableFallbackInput: 1
 --- !u!1 &1284995881
