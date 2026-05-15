@@ -236,6 +236,13 @@ MonoBehaviour:
   movementRadius: 6
   lockY: 1
   fixedY: 1.39
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  collisionRadius: 0.45
+  collisionCastHeight: 0.25
+  obstacleCheckDistance: 0.35
+  directionPickAttempts: 8
 --- !u!54 &3077871
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -566,6 +573,13 @@ MonoBehaviour:
   movementRadius: 6
   lockY: 1
   fixedY: 1.39
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  collisionRadius: 0.45
+  collisionCastHeight: 0.25
+  obstacleCheckDistance: 0.35
+  directionPickAttempts: 8
 --- !u!54 &18282021
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -698,7 +712,7 @@ Transform:
   m_GameObject: {fileID: 18282019}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.7, y: 3.17, z: -8.725}
+  m_LocalPosition: {x: 2.44, y: 1.54, z: -3.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6212,6 +6226,13 @@ MonoBehaviour:
   movementRadius: 6
   lockY: 1
   fixedY: 1.39
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  collisionRadius: 0.45
+  collisionCastHeight: 0.25
+  obstacleCheckDistance: 0.35
+  directionPickAttempts: 8
 --- !u!54 &342357997
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -16283,7 +16304,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a8b72d5d8055147f2b72b271a6acacef, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.07
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a8b72d5d8055147f2b72b271a6acacef, type: 3}
       propertyPath: m_LocalPosition.y
@@ -16291,7 +16312,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a8b72d5d8055147f2b72b271a6acacef, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.13
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a8b72d5d8055147f2b72b271a6acacef, type: 3}
       propertyPath: m_LocalRotation.w
@@ -20657,6 +20678,13 @@ MonoBehaviour:
   movementRadius: 6
   lockY: 1
   fixedY: 1.39
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  collisionRadius: 0.45
+  collisionCastHeight: 0.25
+  obstacleCheckDistance: 0.35
+  directionPickAttempts: 8
 --- !u!54 &1361094791
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -23991,6 +24019,13 @@ MonoBehaviour:
   movementRadius: 6
   lockY: 1
   fixedY: 1.39
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  collisionRadius: 0.45
+  collisionCastHeight: 0.25
+  obstacleCheckDistance: 0.35
+  directionPickAttempts: 8
 --- !u!1001 &1571461214
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24091,7 +24126,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a8b72d5d8055147f2b72b271a6acacef, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a8b72d5d8055147f2b72b271a6acacef, type: 3}
       propertyPath: m_LocalPosition.y
@@ -24099,7 +24134,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a8b72d5d8055147f2b72b271a6acacef, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -4.37
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a8b72d5d8055147f2b72b271a6acacef, type: 3}
       propertyPath: m_LocalRotation.w
@@ -30942,6 +30977,9 @@ MonoBehaviour:
   - {fileID: 1559776942}
   - {fileID: 1361094792}
   - {fileID: 3077872}
+  - {fileID: 1994840112}
+  - {fileID: 18282022}
+  - {fileID: 342357998}
   nextSceneName: Level3_Rescue
   loadDelay: 2
   startCheckDelay: 1
@@ -30999,6 +31037,13 @@ MonoBehaviour:
   movementRadius: 6
   lockY: 1
   fixedY: 1.39
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  collisionRadius: 0.45
+  collisionCastHeight: 0.25
+  obstacleCheckDistance: 0.35
+  directionPickAttempts: 8
 --- !u!54 &1994840111
 Rigidbody:
   m_ObjectHideFlags: 0
